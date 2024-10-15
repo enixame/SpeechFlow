@@ -27,7 +27,7 @@ p = pyaudio.PyAudio()
 FORMAT = pyaudio.paInt16  # 16-bit audio format
 CHANNELS = 1  # Mono channel
 RATE = 16000  # 16 kHz sample rate (Whisper prefers this rate)
-CHUNK = 320  # 10 ms chunk size (16000 samples/second * 0.02 seconds)
+CHUNK = 320  # 20 ms chunk size (16000 samples/second * 0.02 seconds)
 
 stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
 
