@@ -23,8 +23,30 @@ Ce projet met en œuvre des technologies modernes, telles que **Whisper** et **L
 
 ## Installation
 
+Ce projet a été optimisé pour la performance avec une faible latence en utilisant un traitement asynchrone de l'audio et peut tirer parti de l'accélération GPU pour une transcription plus rapide.
+
+## Fonctionnalités (Python)
+- Transcription audio en temps réel avec Whisper
+- Détection d'activité vocale (VAD) avec WebRTC
+- Réduction de bruit avec la bibliothèque `noisereduce`
+- Traitement audio à faible latence avec I/O asynchrone
+- Accélération GPU optionnelle avec PyTorch
+
+## Prérequis (Python)
+- Python 3.8+
+- PyTorch avec support CUDA (pour l'accélération GPU)
+- PyAudio (pour capturer l'audio depuis le microphone)
+- Whisper d'OpenAI (pour la transcription)
+
 ### Python
 
 1. Installez les dépendances Python en utilisant le fichier `requirements.txt` :
    ```bash
    pip install -r python/requirements.txt
+
+2. Whisper documentation: https://github.com/openai/whisper
+
+3. Cuda and torch: https://pytorch.org/get-started/locally/
+  ```bash
+  pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
