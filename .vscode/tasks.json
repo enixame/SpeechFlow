@@ -1,1 +1,16 @@
-
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Run Python Script",
+        "type": "shell",
+        "command": "python ${workspaceFolder}/python/speech_to_text.py",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": []
+      },
+    ]
+  }
+  
