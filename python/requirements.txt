@@ -3,3 +3,4 @@ webrtcvad
 openai-whisper
 numpy
 noisereduce
+asyncio

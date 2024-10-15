@@ -5,14 +5,20 @@ import webrtcvad
 import queue
 import threading
 import logging
+import asyncio
 import noisereduce as nr  # Import the noise reduction library
+import torch
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# Vérifier si CUDA est disponible
+device = "cuda" if torch.cuda.is_available() else "cpu"
+logger.info(f"Using device: {device}")
+
 # Load Whisper model
-model = whisper.load_model("small")
+model = whisper.load_model("large", device=device)
 
 # Initialize PyAudio for capturing audio from the microphone
 p = pyaudio.PyAudio()
@@ -21,13 +27,13 @@ p = pyaudio.PyAudio()
 FORMAT = pyaudio.paInt16  # 16-bit audio format
 CHANNELS = 1  # Mono channel
 RATE = 16000  # 16 kHz sample rate (Whisper prefers this rate)
-CHUNK = 320  # 20 ms chunk size (16000 samples/second * 0.02 seconds)
+CHUNK = 320  # 10 ms chunk size (16000 samples/second * 0.02 seconds)
 
 stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
 
 # Initialize WebRTC VAD for detecting speech and pauses
 vad = webrtcvad.Vad()
-vad.set_mode(3)  # Sensitivity level (0 to 3, where 3 is the most sensitive)
+vad.set_mode(1)  # Sensitivity level (0 to 3, where 3 is the most sensitive)
 
 # Queue for holding audio data to be transcribed
 transcription_queue = queue.Queue()
@@ -82,13 +88,19 @@ def reduce_noise(audio_buffer, rate):
     reduced_noise = nr.reduce_noise(y=audio_buffer.astype(np.float32), sr=rate)
     return reduced_noise.astype(np.int16)
 
-logger.info("Listening for speech... Press Ctrl+C to stop.")
-audio_buffer = np.zeros((0), dtype=np.int16)
-is_speaking = False
-
-try:
+async def read_audio_stream_async(stream, chunk_size):
+    """Async function to read audio data from the stream."""
     while True:
-        audio_chunk = stream.read(CHUNK)
+        audio_chunk = stream.read(chunk_size, exception_on_overflow=False)
+        await asyncio.sleep(0.01)  # Allow the event loop to process other tasks
+        yield audio_chunk
+
+async def process_audio():
+    """Main async function to process audio chunks."""
+    audio_buffer = np.zeros((0), dtype=np.int16)
+    is_speaking = False
+
+    async for audio_chunk in read_audio_stream_async(stream, CHUNK):
         audio_data = np.frombuffer(audio_chunk, dtype=np.int16)
 
         # Apply noise reduction
@@ -111,11 +123,15 @@ try:
                     transcription_queue.put(audio_buffer)
                 else:
                     logger.info(f"Non-human voice or noise detected (Frequency: {dominant_frequency:.2f} Hz), ignoring...")
-                
+
                 # Clear the buffer and reset speaking flag after processing
                 audio_buffer = np.zeros((0), dtype=np.int16)
                 is_speaking = False
 
+# Start the main asyncio loop
+logger.info("Listening for speech... Press Ctrl+C to stop.")
+try:
+    asyncio.run(process_audio())
 except KeyboardInterrupt:
     logger.info("Stopping transcription.")
     stream.stop_stream()
