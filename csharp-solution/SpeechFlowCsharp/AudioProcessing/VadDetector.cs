@@ -2,7 +2,7 @@ using WebRtcVadSharp;
 
 namespace SpeechFlowCsharp.AudioProcessing
 {
-    public class VadDetector
+    public sealed class VadDetector
     {
         // Instance de WebRtcVad qui gère la détection d'activité vocale
         private WebRtcVad _vad;

@@ -2,6 +2,14 @@
     "version": "2.0.0",
     "tasks": [
       {
+        "type": "dotnet",
+        "task": "build ${workspaceFolder}/csharp-solution/SpeechFlowCsharp/SpeechFlowCsharp.csproj",
+        "file": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp/SpeechFlowCsharp.csproj",
+        "group": "build",
+        "problemMatcher": [],
+        "label": "build"
+      },
+      {
         "label": "Run Python Script",
         "type": "shell",
         "command": "python ${workspaceFolder}/python/speech_to_text.py",
@@ -13,4 +21,3 @@
       },
     ]
   }
-  

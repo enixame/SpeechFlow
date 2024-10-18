@@ -11,9 +11,16 @@
   
   <ItemGroup>
     <PackageReference Include="NAudio" Version="2.2.1" />
-    <PackageReference Include="RNNoiseSharp" Version="1.0.0" />
     <PackageReference Include="WebRtcVadSharp" Version="1.3.2" />
     <PackageReference Include="Whisper.net" Version="1.7.0" />
+    <PackageReference Include="Whisper.net.Runtime.Cuda" Version="1.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(UserProfile)\.nuget\packages\webrtcvadsharp\1.3.2\build\win-x64\native\WebRtcVad.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>WebRtcVad.dll</TargetPath>
+    </None>
   </ItemGroup>
 
 </Project>

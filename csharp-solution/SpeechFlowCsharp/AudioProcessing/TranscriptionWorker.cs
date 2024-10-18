@@ -2,36 +2,36 @@ using Whisper.net;
 
 namespace SpeechFlowCsharp.AudioProcessing
 {
-    public static class TranscriptionWorker
+    public sealed class TranscriptionWorker
     {
-        private static WhisperProcessor? _processor;
+        private readonly WhisperProcessor? _processor;
+
+        public TranscriptionWorker(string modelPath, string language)
+        {
+            WhisperFactory factory = WhisperFactory.FromPath(modelPath);
+            // Créer et configurer le processeur Whisper avec le modèle et la langue spécifiée (français ici)
+            _processor = factory.CreateBuilder()  // Créer un builder pour le processeur
+                        .WithLanguage(language)      // Configurer la langue pour la transcription
+                        .Build();                // Construire le processeur
+        }
 
         /// <summary>
         /// Méthode pour démarrer la transcription dans un thread séparé.
         /// </summary>
         /// <param name="queue">File d'attente contenant les segments audio à transcrire.</param>
-        public static void StartTranscription(TranscriptionQueue queue)
+        public async Task StartTranscription(TranscriptionQueue queue)
         {
-            string modelPath = "models/ggml-base.fr.bin"; // Chemin vers le modèle
-
-            WhisperFactory factory = WhisperFactory.FromPath(modelPath);
-            // Créer et configurer le processeur Whisper avec le modèle et la langue spécifiée (français ici)
-            _processor = factory.CreateBuilder()  // Créer un builder pour le processeur
-                        .WithLanguage("fr")      // Configurer la langue pour la transcription
-                        .Build();                // Construire le processeur
-            
             // Boucle principale pour consommer la file d'attente et transcrire les segments
             while (queue.IsRunning)
             {
                 if (queue.TryDequeue(out var audioSegment))
                 {
                     // Transcrire le segment audio de manière asynchrone
-                    TranscribeAudioAsync(audioSegment!).Wait(); // Attend la fin de la transcription
+                    await TranscribeAudioAsync(audioSegment!); // Attend la fin de la transcription
                 }
                 else
                 {
-                    // Si la file d'attente est vide, attendre un petit moment
-                    Thread.Sleep(100);
+                    await Task.Delay(100); // Ajouter un petit délai si la file est vide
                 }
             }
         }
@@ -40,7 +40,7 @@ namespace SpeechFlowCsharp.AudioProcessing
         /// Méthode asynchrone pour transcrire les données audio en utilisant Whisper.
         /// </summary>
         /// <param name="audioData">Segment audio à transcrire.</param>
-        private static async Task TranscribeAudioAsync(short[] audioData)
+        private async Task TranscribeAudioAsync(short[] audioData)
         {
             // Convertir les données audio en un format compatible (par exemple, en tableau de floats)
             float[] floatAudio = new float[audioData.Length];

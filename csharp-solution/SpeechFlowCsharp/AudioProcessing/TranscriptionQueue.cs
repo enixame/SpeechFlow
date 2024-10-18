@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 namespace SpeechFlowCsharp.AudioProcessing
 {
-    public class TranscriptionQueue
+    public sealed class TranscriptionQueue
     {
         private readonly ConcurrentQueue<short[]> _queue = new();
         private bool _isRunning = true;

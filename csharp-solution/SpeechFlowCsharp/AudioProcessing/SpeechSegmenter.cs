@@ -5,13 +5,13 @@ namespace SpeechFlowCsharp.AudioProcessing
     /// Cette classe accumule les échantillons vocaux lorsque la parole est détectée et déclenche un événement lorsque
     /// le segment de parole est terminé (lorsqu'un silence est détecté).
     /// </summary>
-    public class SpeechSegmenter
+    public sealed class SpeechSegmenter
     {
         // Liste utilisée pour accumuler les échantillons vocaux détectés pendant qu'il y a de la parole.
         private List<short> _currentSegment = new();
 
         // Instance de VadDetector utilisée pour analyser les échantillons audio et déterminer s'il y a de la parole.
-        private readonly VadDetector _vadDetector;
+        private readonly VoiceFilter _voiceFilter;
 
         /// <summary>
         /// Événement déclenché lorsqu'un segment de parole complet est détecté.
@@ -24,9 +24,9 @@ namespace SpeechFlowCsharp.AudioProcessing
         /// Reçoit une instance de VadDetector pour utiliser la détection d'activité vocale.
         /// </summary>
         /// <param name="vad">Instance de VadDetector utilisée pour analyser les échantillons audio.</param>
-        public SpeechSegmenter(VadDetector vad)
+        public SpeechSegmenter(VoiceFilter voiceFilter)
         {
-            _vadDetector = vad ?? throw new ArgumentNullException(nameof(vad)); // Vérification de null ici
+            _voiceFilter = voiceFilter ?? throw new ArgumentNullException(nameof(voiceFilter)); // Vérification de null ici
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace SpeechFlowCsharp.AudioProcessing
         public void ProcessAudio(short[] audioData)
         {
             // Utilise VadDetector pour vérifier si le segment audio contient de la parole.
-            if (_vadDetector.IsSpeech(audioData))
+            if (_voiceFilter.IsHumanVoice(audioData))
             {
                 // Si de la parole est détectée, accumuler les échantillons dans le segment en cours.
                 _currentSegment.AddRange(audioData);

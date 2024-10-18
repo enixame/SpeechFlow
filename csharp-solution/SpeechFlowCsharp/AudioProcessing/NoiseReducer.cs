@@ -1,75 +1,100 @@
-using RNNoiseSharp;
+using NAudio.Dsp;
 
 namespace SpeechFlowCsharp.AudioProcessing
 {
     /// <summary>
     /// Classe responsable de la réduction du bruit dans les données audio capturées.
-    /// Utilise la bibliothèque RNNoise pour appliquer un filtrage neural aux données audio et améliorer la qualité en supprimant le bruit de fond.
     /// </summary>
     public class NoiseReducer
     {
-        // Objet Denoiser fourni par la bibliothèque RNNoise.
-        private readonly Denoiser _denoiser;
+        private readonly BiQuadFilter lowPassFilter;
+        private readonly int sampleRate;
 
-        /// <summary>
-        /// Constructeur de la classe NoiseReducer.
-        /// Initialise l'instance de Denoiser utilisée pour le traitement du bruit.
-        /// </summary>
-        public NoiseReducer()
+        public NoiseReducer(int sampleRate, float cutoffFrequency)
         {
-            // Crée une nouvelle instance de Denoiser pour traiter les frames audio.
-            _denoiser = new Denoiser();
+            this.sampleRate = sampleRate;
+            // Crée un filtre passe-bas avec une fréquence de coupure donnée
+            lowPassFilter = BiQuadFilter.LowPassFilter(sampleRate, cutoffFrequency, 1.0f);
         }
 
         /// <summary>
-        /// Réduit le bruit dans un tableau d'échantillons audio.
-        /// Le traitement s'effectue par blocs de 480 échantillons, qui correspondent à des frames de 30 ms à 16 kHz.
+        /// Applique un filtre passe-bas sur les données audio capturées en short[], 
+        /// et affiche la fréquence dominante.
         /// </summary>
-        /// <param name="audioData">Tableau d'échantillons audio (format 16 bits, 16 kHz) à traiter.</param>
-        /// <returns>Un tableau d'échantillons audio avec le bruit réduit.</returns>
-        public short[] ReduceNoise(short[] audioData)
+        /// <param name="buffer">Le tableau contenant les échantillons audio (short[]).</param>
+        /// <param name="offset">L'index de départ du tableau.</param>
+        /// <param name="count">Le nombre d'échantillons à traiter.</param>
+        public void ApplyLowPassFilterAndShowFrequency(short[] buffer, int offset, int count)
         {
-            int frameSize = 480; // Taille de la frame que RNNoise traite (480 échantillons = 30 ms à 16 kHz)
+            // Convertit le tableau short[] en float[] pour appliquer le filtre
+            float[] floatBuffer = ConvertShortArrayToFloatArray(buffer);
 
-            // Buffer de sortie où les échantillons audio traités (sans bruit) seront stockés.
-            short[] outputBuffer = new short[audioData.Length];
-
-            // Buffer temporaire pour contenir une frame d'audio convertie en flottants (le format attendu par RNNoise).
-            float[] floatFrame = new float[frameSize];
-
-            // Traiter l'audio par frames (blocs) de 480 échantillons.
-            for (int i = 0; i < audioData.Length; i += frameSize)
+            // Applique le filtre passe-bas
+            for (int i = offset; i < offset + count; i++)
             {
-                // Déterminer la taille de la frame actuelle (à la fin des données, elle peut être plus petite que 480 échantillons).
-                int frameEnd = Math.Min(i + frameSize, audioData.Length);
+                floatBuffer[i] = lowPassFilter.Transform(floatBuffer[i]);
+            }
 
-                // Remplir le floatFrame avec les échantillons audio de la frame actuelle, convertis de short (int16) en float.
-                for (int j = 0; j < frameEnd - i; j++)
-                {
-                    floatFrame[j] = audioData[i + j] / 32768f; // Conversion des short en float (entre -1 et 1)
-                }
+            // Calcule et affiche la fréquence dominante
+            float dominantFrequency = CalculateDominantFrequency(floatBuffer, count);
+            Console.WriteLine($"Fréquence dominante après filtrage: {dominantFrequency} Hz");
 
-                // Appliquer le débruitage sur la frame actuelle en appelant la méthode Denoise.
-                int result = _denoiser.Denoise(floatFrame);
+            // Reconvertit le tableau float[] en short[] si nécessaire
+            for (int i = offset; i < offset + count; i++)
+            {
+                buffer[i] = Convert.ToInt16(floatBuffer[i] * 32768.0f);
+            }
+        }
 
-                // Vérifier si la réduction de bruit a été réussie (result == 0 signifie succès).
-                if (result == 0)
+        /// <summary>
+        /// Convertit un tableau short[] en float[].
+        /// </summary>
+        private static float[] ConvertShortArrayToFloatArray(short[] shortArray)
+        {
+            float[] floatArray = new float[shortArray.Length];
+            for (int i = 0; i < shortArray.Length; i++)
+            {
+                // Division par 32768.0f pour normaliser la plage [-32768, 32767] à [-1.0, 1.0]
+                floatArray[i] = shortArray[i] / 32768.0f;
+            }
+            return floatArray;
+        }
+
+        /// <summary>
+        /// Calcule la fréquence dominante dans un tableau d'échantillons audio.
+        /// </summary>
+        /// <param name="audioSamples">Tableau des échantillons audio en float.</param>
+        /// <param name="length">Nombre d'échantillons à traiter.</param>
+        /// <returns>La fréquence dominante en Hertz.</returns>
+        private float CalculateDominantFrequency(float[] audioSamples, int length)
+        {
+            // Applique la FFT (Transformée de Fourier Rapide)
+            Complex[] fftBuffer = new Complex[length];
+            for (int i = 0; i < length; i++)
+            {
+                fftBuffer[i].X = (float)(audioSamples[i] * FastFourierTransform.HannWindow(i, length));  // Applique une fenêtre pour réduire les artefacts
+                fftBuffer[i].Y = 0;  // Partie imaginaire à 0
+            }
+
+            // Effectue la FFT
+            FastFourierTransform.FFT(true, (int)Math.Log(length, 2.0), fftBuffer);
+
+            // Trouve l'amplitude maximale et la fréquence correspondante
+            int maxIndex = 0;
+            float maxMagnitude = 0.0f;
+            for (int i = 0; i < length / 2; i++)  // Nous n'avons besoin que de la moitié de la FFT (symétrique)
+            {
+                float magnitude = fftBuffer[i].X * fftBuffer[i].X + fftBuffer[i].Y * fftBuffer[i].Y;
+                if (magnitude > maxMagnitude)
                 {
-                    // Si succès, convertir les échantillons float débruités en short (16 bits) et les stocker dans le buffer de sortie.
-                    for (int j = 0; j < frameEnd - i; j++)
-                    {
-                        outputBuffer[i + j] = (short)(floatFrame[j] * 32768f); // Conversion inverse de float à short
-                    }
-                }
-                else
-                {
-                    // Si la réduction de bruit échoue, conserver les données originales dans le buffer de sortie.
-                    Array.Copy(audioData, i, outputBuffer, i, frameEnd - i);
+                    maxMagnitude = magnitude;
+                    maxIndex = i;
                 }
             }
 
-            // Retourner le tableau d'échantillons audio avec réduction du bruit (ou les données originales si échec).
-            return outputBuffer;
+            // Calcule la fréquence dominante
+            float dominantFrequency = (float)maxIndex * sampleRate / length;
+            return dominantFrequency;
         }
     }
 }
