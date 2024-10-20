@@ -2,12 +2,38 @@
     "version": "2.0.0",
     "tasks": [
       {
-        "type": "dotnet",
-        "task": "build ${workspaceFolder}/csharp-solution/SpeechFlowCsharp/SpeechFlowCsharp.csproj",
-        "file": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp/SpeechFlowCsharp.csproj",
-        "group": "build",
-        "problemMatcher": [],
-        "label": "build"
+        "label": "build SpeechFlowCsharp",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+          "build",
+          "${workspaceFolder}/csharp-solution/SpeechFlowCsharp/SpeechFlowCsharp.csproj"
+        ],
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "build SpeechFlowCsharp.Tests",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+          "build",
+          "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.Tests/SpeechFlowCsharp.Tests.csproj"
+        ],
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "Run .NET Tests",
+        "type": "shell",
+        "command": "dotnet",
+        "args": [
+          "test"
+        ],
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        },
+        "problemMatcher": "$msCompile",
+        "detail": "Tâche pour exécuter les tests unitaires avec dotnet test"
       },
       {
         "label": "Run Python Script",
@@ -18,6 +44,6 @@
           "isDefault": true
         },
         "problemMatcher": []
-      },
+      }
     ]
   }

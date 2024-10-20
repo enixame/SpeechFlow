@@ -12,11 +12,8 @@ namespace SpeechFlowCsharp.AudioProcessing
         // Liste utilisée pour accumuler les échantillons vocaux détectés pendant qu'il y a de la parole.
         private ConcurrentQueue<short> _currentSegment = new();
 
-        // Instance de VadDetector utilisée pour analyser les échantillons audio et déterminer s'il y a de la parole.
-        private readonly VadDetector _vadDetector;
-
         // Crée un filtre passe-bande pour les fréquences de la voix humaine (85 Hz à 255 Hz)
-        private readonly VoiceFilter _voiceFilter;
+        private readonly IVoiceFilter _voiceFilter;
 
         /// <summary>
         /// Événement déclenché lorsqu'un segment de parole complet est détecté.
@@ -28,11 +25,20 @@ namespace SpeechFlowCsharp.AudioProcessing
         /// Constructeur de la classe SpeechSegmenter.
         /// Reçoit une instance de VadDetector pour utiliser la détection d'activité vocale.
         /// </summary>
-        /// <param name="vad">Instance de VadDetector utilisée pour analyser les échantillons audio.</param>
-        public SpeechSegmenter(VadDetector vadDetector, int sampleRate)
+        /// <param name="vadDetector">Instance de VadDetector utilisée pour analyser les échantillons audio.</param>
+        public SpeechSegmenter(IVadDetector vadDetector, int sampleRate)
         {
-            _vadDetector = vadDetector;
-            _voiceFilter = new VoiceFilter(_vadDetector, sampleRate);  // Crée un filtre de voix humaine
+            _voiceFilter = new VoiceFilter(vadDetector, sampleRate);  // Crée un filtre de voix humaine
+        }
+
+        /// <summary>
+        /// Constructeur de la classe SpeechSegmenter.
+        /// Reçoit une instance de VoiceFilter pour utiliser la détection d'activité vocale.
+        /// </summary>
+        /// <param name="voiceFilter">Instance de VadDetector utilisée pour analyser les échantillons audio.</param>
+        public SpeechSegmenter(IVoiceFilter voiceFilter)
+        {
+            _voiceFilter = voiceFilter;  // Crée un filtre de voix humaine
         }
 
         // Processus asynchrone pour gérer les segments audio

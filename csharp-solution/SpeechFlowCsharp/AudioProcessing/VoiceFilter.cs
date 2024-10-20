@@ -2,12 +2,12 @@ using NAudio.Dsp;
 
 namespace SpeechFlowCsharp.AudioProcessing
 {
-    public sealed class VoiceFilter
+    public sealed class VoiceFilter : IVoiceFilter
     {
         private readonly BiQuadFilter _bandPassFilter;
-        private readonly VadDetector _vadDetector;
+        private readonly IVadDetector _vadDetector;
 
-        public VoiceFilter(VadDetector vad, int sampleRate)
+        public VoiceFilter(IVadDetector vad, int sampleRate)
         {
             // Crée un filtre passe-bande pour les fréquences de la voix humaine (85 Hz à 255 Hz)
             _bandPassFilter = BiQuadFilter.BandPassFilterConstantPeakGain(sampleRate, 255.0f, 85.0f);

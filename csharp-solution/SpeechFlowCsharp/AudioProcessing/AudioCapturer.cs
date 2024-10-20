@@ -8,7 +8,22 @@ namespace SpeechFlowCsharp.AudioProcessing
     /// </summary>
     public sealed class AudioCapturer
     {
-        private WaveInEvent? _waveIn;
+        private IWaveIn? _waveIn;
+
+        private WaveFormat _waveFormat;
+
+        public bool IsCapturing { get; private set; }
+
+        
+        public AudioCapturer(WaveFormat? waveFormat)
+        {
+            _waveFormat = _waveFormat;
+        }
+
+        public AudioCapturer()
+            : this(new WaveFormat(16000, 1)) // Définit le format audio : 16 kHz en mono (1 canal) par défaut.
+        {
+        }
 
         /// <summary>
         /// Événement déclenché lorsqu'un nouveau lot de données audio est disponible.
@@ -18,15 +33,13 @@ namespace SpeechFlowCsharp.AudioProcessing
 
         /// <summary>
         /// Démarre la capture audio en temps réel depuis le périphérique microphone.
-        /// Configure NAudio pour enregistrer à 16 kHz en mono.
         /// </summary>
         public void StartCapture()
         {
             // Initialise un événement WaveIn pour capturer l'audio à partir du microphone.
             _waveIn = new WaveInEvent
             {
-                // Définit le format audio : 16 kHz en mono (1 canal).
-                WaveFormat = new WaveFormat(16000, 1)
+                WaveFormat = _waveFormat
             };
 
             // Abonne l'événement OnDataAvailable pour traiter les données capturées.
@@ -34,6 +47,8 @@ namespace SpeechFlowCsharp.AudioProcessing
 
             // Démarre la capture audio.
             _waveIn.StartRecording();
+
+            IsCapturing = true;
         }
 
         /// <summary>
@@ -44,11 +59,17 @@ namespace SpeechFlowCsharp.AudioProcessing
             if (_waveIn == null)
                 return;
 
-            // Arrête l'enregistrement audio.
-            _waveIn.StopRecording();
-
-            // Libère les ressources associées à l'objet WaveIn.
-            _waveIn.Dispose();
+            try
+            {
+                // Arrête l'enregistrement audio.
+                _waveIn.StopRecording();
+            }
+            finally
+            {
+                // Libère les ressources associées à l'objet WaveIn.
+                 _waveIn.Dispose();
+                IsCapturing = false;
+            }
         }
 
         /// <summary>
