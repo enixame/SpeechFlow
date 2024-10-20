@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace SpeechFlowCsharp.AudioProcessing
 {
     /// <summary>
@@ -8,9 +10,12 @@ namespace SpeechFlowCsharp.AudioProcessing
     public sealed class SpeechSegmenter
     {
         // Liste utilisée pour accumuler les échantillons vocaux détectés pendant qu'il y a de la parole.
-        private List<short> _currentSegment = new();
+        private ConcurrentQueue<short> _currentSegment = new();
 
         // Instance de VadDetector utilisée pour analyser les échantillons audio et déterminer s'il y a de la parole.
+        private readonly VadDetector _vadDetector;
+
+        // Crée un filtre passe-bande pour les fréquences de la voix humaine (85 Hz à 255 Hz)
         private readonly VoiceFilter _voiceFilter;
 
         /// <summary>
@@ -24,32 +29,48 @@ namespace SpeechFlowCsharp.AudioProcessing
         /// Reçoit une instance de VadDetector pour utiliser la détection d'activité vocale.
         /// </summary>
         /// <param name="vad">Instance de VadDetector utilisée pour analyser les échantillons audio.</param>
-        public SpeechSegmenter(VoiceFilter voiceFilter)
+        public SpeechSegmenter(VadDetector vadDetector, int sampleRate)
         {
-            _voiceFilter = voiceFilter ?? throw new ArgumentNullException(nameof(voiceFilter)); // Vérification de null ici
+            _vadDetector = vadDetector;
+            _voiceFilter = new VoiceFilter(_vadDetector, sampleRate);  // Crée un filtre de voix humaine
         }
 
-        /// <summary>
-        /// Traite les données audio pour détecter la parole.
-        /// Accumule les échantillons lorsque de la parole est détectée et déclenche un événement lorsque la parole cesse.
-        /// </summary>
-        /// <param name="audioData">Tableau d'échantillons audio (16 bits, 16 kHz) à analyser.</param>
-        public void ProcessAudio(short[] audioData)
+        // Processus asynchrone pour gérer les segments audio
+        public async Task ProcessAudioAsync(short[] audioData)
         {
-            // Utilise VadDetector pour vérifier si le segment audio contient de la parole.
+            // Appliquer le filtre de voix humaine avant la détection VAD
             if (_voiceFilter.IsHumanVoice(audioData))
             {
                 // Si de la parole est détectée, accumuler les échantillons dans le segment en cours.
-                _currentSegment.AddRange(audioData);
+                // Ajouter les échantillons à la queue de manière thread-safe
+                foreach (var sample in audioData)
+                {
+                    _currentSegment.Enqueue(sample);
+                }
             }
-            else if (_currentSegment.Count > 0)
+            else if (!_currentSegment.IsEmpty)
             {
-                // Si un silence est détecté (et que nous avons un segment accumulé), déclencher l'événement.
-                SpeechSegmentDetected?.Invoke(this, _currentSegment.ToArray());
+                // Créer une liste temporaire pour stocker les échantillons et vider la queue
+                var segmentList = new List<short>();
 
-                // Réinitialiser le segment en cours après avoir déclenché l'événement.
-                _currentSegment.Clear();
+                while (_currentSegment.TryDequeue(out var sample))
+                {
+                    segmentList.Add(sample);
+                }
+
+                if (segmentList.Count > 0)
+                {
+                    // Si un silence est détecté (et que nous avons un segment accumulé), déclencher l'événement.
+                    OnSpeechSegmentDetected([.. segmentList]);
+                }
             }
+            await Task.CompletedTask;  // Utilisation d'une tâche asynchrone pour améliorer la réactivité
+        }
+
+        // Déclenche l'événement lorsqu'un segment de parole est détecté
+        private void OnSpeechSegmentDetected(short[] segment)
+        {
+            SpeechSegmentDetected?.Invoke(this, segment);
         }
     }
 }
