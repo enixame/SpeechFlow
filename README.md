@@ -50,3 +50,73 @@ Ce projet a été optimisé pour la performance avec une faible latence en utili
   ```bash
   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
+# SpeechFlowCsharp (C#)
+
+**SpeechFlowCsharp** est un projet C# conçu pour capturer, traiter et transcrire des segments audio en temps réel en utilisant l'API **Whisper**. Ce projet est modulaire et fournit des fonctionnalités avancées telles que la capture d'audio, la segmentation de la parole, la mise en file d'attente des segments audio, et la transcription automatique.
+
+## Fonctionnalités principales (C#)
+
+- **Capture audio en temps réel** : Capture des segments audio à partir d'une source telle qu'un microphone.
+- **Segmentation audio** : Détection d'activité vocale (VAD) pour séparer les segments de parole des périodes de silence.
+- **Transcription automatique** : Utilise le modèle **Whisper** pour convertir les segments audio en texte.
+- **Mise en file d'attente** : Gestion de la file d'attente des segments audio en attente de transcription.
+- **Événements** : Déclenchement d'événements lors de la fin de la transcription ou la détection de silence.
+
+## Architecture du projet
+
+### Classes principales
+
+#### `AudioCapturer`
+- **Rôle** : Gère la capture des données audio à partir d'une source.
+
+#### `SpeechSegmenter`
+- **Rôle** : Analyse les segments audio pour détecter la parole et le silence. Accumule les échantillons audio lorsqu'une activité vocale est détectée, et complète le segment lorsque le silence est détecté.
+
+#### `TranscriptionQueue`
+- **Rôle** : Gère la file d'attente des segments audio à transcrire.
+
+#### `TranscriptionWorker`
+- **Rôle** : Transcrit les segments audio en texte en utilisant l'API **Whisper** et déclenche des événements une fois la transcription terminée.
+
+#### `VadDetector`
+- **Rôle** : Détecte l'activité vocale (VAD) dans les segments audio, permettant au **SpeechSegmenter** de différencier la parole du silence.
+
+#### `VoiceFilter`
+- **Rôle** : Filtre les fréquences audio pour isoler la voix humaine et supprimer les bruits.
+
+## Fonctionnement global
+
+1. **Capture audio** : Les segments audio sont capturés en temps réel via la classe `AudioCapturer`.
+2. **Segmentation de la parole** : Les échantillons sont analysés par le `SpeechSegmenter` qui détecte les segments de parole et de silence en utilisant le `VadDetector`.
+3. **Mise en file d'attente** : Les segments de parole sont ajoutés à la `TranscriptionQueue` pour être transcrits ultérieurement.
+4. **Transcription automatique** : Le `TranscriptionWorker` consomme les segments audio de la file d'attente et les transcrit en texte avec **Whisper**.
+5. **Événements** : Des événements sont déclenchés à la fin de la transcription pour traiter le texte transcrit ou indiquer la fin d'un segment.
+
+## Exigences du système
+
+- **C#**
+- **.NET Core 8.0 ou supérieur**
+- **Whisper API**
+
+## Installation
+
+1. Clonez le dépôt du projet :
+
+    ```bash
+    git clone https://github.com/enixame/SpeechFlow.git
+    ```
+
+2. Installez les dépendances nécessaires.
+
+3. Lancez le projet en utilisant Visual Studio ou en ligne de commande avec :
+
+    ```bash
+    dotnet build
+    dotnet run
+    ```
+
+## Contribuer
+
+Les contributions sont les bienvenues. Veuillez soumettre une issue avant d'envoyer une pull request.
+
+
