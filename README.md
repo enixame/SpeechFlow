@@ -115,6 +115,9 @@ Ce projet a été optimisé pour la performance avec une faible latence en utili
     dotnet run
     ```
 
+4. Ajouter des keyBindings (fichier keybindings.json) dans C:\Users\<User>\AppData\Roaming\Code\User
+   ou Ctrl+Shift+P puis Preferences: Open Keyboard Shortcuts (JSON)
+
 ## Contribuer
 
 Les contributions sont les bienvenues. Veuillez soumettre une issue avant d'envoyer une pull request.
