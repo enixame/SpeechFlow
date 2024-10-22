@@ -2,6 +2,76 @@
     "version": "2.0.0",
     "tasks": [
       {
+        "label": "build solution",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+          "build",
+          "${workspaceFolder}/SpeechFlow.sln"
+        ],
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "clean solution",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+          "clean",
+          "${workspaceFolder}/SpeechFlow.sln"
+        ],
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "build SpeechFlowCsharp",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+          "build",
+          "${workspaceFolder}/csharp-solution/SpeechFlowCsharp/SpeechFlowCsharp.csproj"
+        ],
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "build SpeechFlowCsharp.Tests",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+          "build",
+          "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.Tests/SpeechFlowCsharp.Tests.csproj"
+        ],
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "Run .NET Project",
+        "type": "shell",
+        "command": "dotnet",
+        "args": [
+          "run"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "Run .NET Tests",
+        "type": "shell",
+        "command": "dotnet",
+        "args": [
+          "test"
+        ],
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        },
+        "problemMatcher": "$msCompile",
+        "detail": "Tâche pour exécuter les tests unitaires avec dotnet test"
+      },
+      {
         "label": "Run Python Script",
         "type": "shell",
         "command": "python ${workspaceFolder}/python/speech_to_text.py",
@@ -10,7 +80,6 @@
           "isDefault": true
         },
         "problemMatcher": []
-      },
+      }
     ]
   }
-  

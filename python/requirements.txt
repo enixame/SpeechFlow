@@ -4,3 +4,4 @@ openai-whisper
 numpy
 noisereduce
 asyncio
+librosa

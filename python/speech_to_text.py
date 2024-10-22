@@ -8,6 +8,7 @@ import logging
 import asyncio
 import noisereduce as nr  # Import the noise reduction library
 import torch
+import librosa
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -41,6 +42,7 @@ transcription_queue = queue.Queue()
 def transcribe_audio(audio_data):
     # Use Whisper to transcribe the audio data
     audio_data = np.frombuffer(audio_data, dtype=np.int16).astype(np.float32) / 32768.0
+
     result = model.transcribe(audio_data, language="fr")  # Specify French language
     return result["text"]
 
