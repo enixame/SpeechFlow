@@ -40,6 +40,13 @@ class Program
         // Démarrer la capture audio
         audioCapturer.StartCapture();
 
+        // S'abonner à l'événement TranscriptionCompleted
+        transcriptionWorker.TranscriptionCompleted += (sender, transcript) =>
+        {
+            // Traiter le texte transcrit ici
+            Console.WriteLine($"Texte transcrit : {transcript}");
+        };
+
         // Démarrer la transcription
         _ = transcriptionWorker.StartTranscription(cts.Token);
 

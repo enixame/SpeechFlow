@@ -25,4 +25,13 @@
     <ProjectReference Include="..\SpeechFlowCsharp\SpeechFlowCsharp.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="models\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="data\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -10,14 +10,14 @@ namespace SpeechFlowCsharp.AudioProcessing
     {
         private IWaveIn? _waveIn;
 
-        private WaveFormat _waveFormat;
+        private WaveFormat? _waveFormat;
 
         public bool IsCapturing { get; private set; }
 
         
-        public AudioCapturer(WaveFormat? waveFormat)
+        public AudioCapturer(WaveFormat waveFormat)
         {
-            _waveFormat = _waveFormat;
+            _waveFormat = waveFormat ?? throw new ArgumentNullException(nameof(waveFormat));
         }
 
         public AudioCapturer()

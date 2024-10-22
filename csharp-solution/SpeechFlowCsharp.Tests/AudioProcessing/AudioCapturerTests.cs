@@ -1,20 +1,23 @@
 using SpeechFlowCsharp.AudioProcessing;
 
-public class AudioCapturerTests
+namespace SpeechFlowCsharp.Tests.AudioProcessing
 {
-    [Fact]
-    public void TestAudioCapture_StartsAndStopsCorrectly()
+    public sealed class AudioCapturerTests
     {
-        // Arrange
-        var audioCapturer = new AudioCapturer();
+        [Fact]
+        public void TestAudioCapture_StartsAndStopsCorrectly()
+        {
+            // Arrange
+            var audioCapturer = new AudioCapturer();
 
-        // Act
-        audioCapturer.StartCapture();
-        bool isCapturing = audioCapturer.IsCapturing;
-        audioCapturer.StopCapture();
+            // Act
+            audioCapturer.StartCapture();
+            bool isCapturing = audioCapturer.IsCapturing;
+            audioCapturer.StopCapture();
 
-        // Assert
-        Assert.True(isCapturing);
-        Assert.False(audioCapturer.IsCapturing);
+            // Assert
+            Assert.True(isCapturing);
+            Assert.False(audioCapturer.IsCapturing);
+        }
     }
 }

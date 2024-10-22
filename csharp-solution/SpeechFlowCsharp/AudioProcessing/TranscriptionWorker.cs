@@ -10,13 +10,25 @@ namespace SpeechFlowCsharp.AudioProcessing
 
         private Func<string, bool>? _filterText = null;
 
-        public TranscriptionWorker(string modelPath, string language, Func<string, bool>? filterText)
+        /// <summary>
+        /// Événement déclenché lorsqu'un segment de parole complet est détecté.
+        /// Les abonnés peuvent utiliser cet événement pour traiter les segments de parole identifiés.
+        /// </summary>
+        public event EventHandler<string>? TranscriptionCompleted;
+
+
+        public TranscriptionWorker(string modelPath, string language)
         {
             WhisperFactory factory = WhisperFactory.FromPath(modelPath);
             // Créer et configurer le processeur Whisper avec le modèle et la langue spécifiée (français ici)
             _processor = factory.CreateBuilder()  // Créer un builder pour le processeur
                         .WithLanguage(language)      // Configurer la langue pour la transcription
                         .Build();                // Construire le processeur
+        }
+
+        public TranscriptionWorker(string modelPath, string language, Func<string, bool> filterText)
+            : this(modelPath, language)
+        {
             _filterText = filterText;
         }
 
@@ -24,7 +36,7 @@ namespace SpeechFlowCsharp.AudioProcessing
         {
             _transcriptionQueue.Enqueue(audioData);
         }
-
+        
         /// <summary>
         /// Méthode pour démarrer la transcription dans un thread séparé.
         /// </summary>
@@ -36,8 +48,13 @@ namespace SpeechFlowCsharp.AudioProcessing
             {
                 if (_transcriptionQueue.TryDequeue(out var audioSegment))
                 {
-                    // Transcrire le segment audio de manière asynchrone
-                    await TranscribeAudioAsync(audioSegment!); // Attend la fin de la transcription
+                    // Transcrire le segment audio de manière asynchrone et obtenir le texte transcrit
+                    var transcript = await TranscribeAudioAsync(audioSegment!); // Attend la fin de la transcription
+                    if (!string.IsNullOrEmpty(transcript))
+                    {
+                        // Déclencher l'événement lorsque la transcription est terminée
+                        TranscriptionCompleted?.Invoke(this, transcript);
+                    }
                 }
                 else
                 {
@@ -51,7 +68,7 @@ namespace SpeechFlowCsharp.AudioProcessing
         /// </summary>
         /// <param name="audioData">Segment audio à transcrire.</param>
         /// <param name="filterText">Segment audio à transcrire.</param>
-        private async Task TranscribeAudioAsync(short[] audioData)
+        private async Task<string> TranscribeAudioAsync(short[] audioData)
         {
             // Convertir les données audio en un format compatible (par exemple, en tableau de floats)
             float[] floatAudio = new float[audioData.Length];
@@ -62,6 +79,9 @@ namespace SpeechFlowCsharp.AudioProcessing
 
             if (_processor != null)
             {
+                // Stocker le texte transcrit
+                string transcript = string.Empty;
+
                 // Utiliser la méthode asynchrone ProcessAsync pour transcrire l'audio
                 await foreach (var segment in _processor.ProcessAsync(floatAudio))
                 {
@@ -73,13 +93,18 @@ namespace SpeechFlowCsharp.AudioProcessing
                         }
                         else
                         {
-                            // Traiter chaque segment transcrit
-                            Console.WriteLine($"Texte transcrit : {segment.Text}");
+                            // Ajouter le texte transcrit au résultat final
+                            transcript += segment.Text;
                         }
                     }
-                    
                 }
+
+                 // Retourner le texte transcrit
+                return transcript;
             }
+
+            // Si aucun processeur n'est disponible, retourner une chaîne vide
+            return string.Empty;
         }
     }
 }
