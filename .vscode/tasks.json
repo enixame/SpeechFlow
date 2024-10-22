@@ -42,6 +42,22 @@
         "problemMatcher": "$msCompile"
       },
       {
+        "label": "Run .NET Project",
+        "type": "shell",
+        "command": "dotnet",
+        "args": [
+          "run"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": "$msCompile"
+      },
+      {
         "label": "Run .NET Tests",
         "type": "shell",
         "command": "dotnet",
