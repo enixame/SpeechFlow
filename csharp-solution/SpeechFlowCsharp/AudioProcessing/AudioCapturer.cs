@@ -6,7 +6,7 @@ namespace SpeechFlowCsharp.AudioProcessing
     /// Classe responsable de la capture audio en temps réel à partir du microphone.
     /// Utilise la bibliothèque NAudio pour accéder au périphérique audio et capturer les données audio.
     /// </summary>
-    public sealed class AudioCapturer
+    public sealed class AudioCapturer : IAudioCapturer
     {
         private IWaveIn? _waveIn;
 
@@ -56,20 +56,17 @@ namespace SpeechFlowCsharp.AudioProcessing
         /// </summary>
         public void StopCapture()
         {
-            if (_waveIn == null)
-                return;
+            if (_waveIn != null)
+            {
+                // Désabonnement de l'événement pour éviter des fuites
+                _waveIn.DataAvailable -= OnDataAvailable;
 
-            try
-            {
-                // Arrête l'enregistrement audio.
+                // Libération des ressources
                 _waveIn.StopRecording();
+                _waveIn.Dispose();
+                _waveIn = null;
             }
-            finally
-            {
-                // Libère les ressources associées à l'objet WaveIn.
-                 _waveIn.Dispose();
-                IsCapturing = false;
-            }
+            IsCapturing = false;
         }
 
         /// <summary>

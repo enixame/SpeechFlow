@@ -7,7 +7,7 @@ namespace SpeechFlowCsharp.AudioProcessing
     /// Cette classe accumule les échantillons vocaux lorsque la parole est détectée et déclenche un événement lorsque
     /// le segment de parole est terminé (lorsqu'un silence est détecté).
     /// </summary>
-    public sealed class SpeechSegmenter
+    public sealed class SpeechSegmenter : ISpeechSegmenter
     {
         // Liste utilisée pour accumuler les échantillons vocaux détectés pendant qu'il y a de la parole.
         private ConcurrentQueue<short> _currentSegment = new();

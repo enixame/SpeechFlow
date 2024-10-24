@@ -2,7 +2,7 @@ using Whisper.net;
 
 namespace SpeechFlowCsharp.AudioProcessing
 {
-    public sealed class TranscriptionWorker
+    public sealed class TranscriptionWorker : ITranscriptionWorker
     {
         private readonly WhisperProcessor? _processor;
 
@@ -15,7 +15,6 @@ namespace SpeechFlowCsharp.AudioProcessing
         /// Les abonnés peuvent utiliser cet événement pour traiter les segments de parole identifiés.
         /// </summary>
         public event EventHandler<string>? TranscriptionCompleted;
-
 
         public TranscriptionWorker(string modelPath, string language)
         {
