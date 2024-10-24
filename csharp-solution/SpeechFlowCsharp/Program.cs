@@ -48,7 +48,7 @@ class Program
         };
 
         // Démarrer la transcription
-        _ = transcriptionWorker.StartTranscription(cts.Token);
+        _ = transcriptionWorker.StartTranscriptionAsync(cts.Token);
 
         // Attendre que l'utilisateur appuie sur Entrée pour arrêter
         Console.WriteLine("Appuyez sur Entrée pour arrêter...");

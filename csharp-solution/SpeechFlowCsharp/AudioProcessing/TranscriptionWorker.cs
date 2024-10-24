@@ -38,10 +38,10 @@ namespace SpeechFlowCsharp.AudioProcessing
         }
         
         /// <summary>
-        /// Méthode pour démarrer la transcription dans un thread séparé.
+        /// Méthode pour démarrer la transcription.
         /// </summary>
         /// <param name="queue">File d'attente contenant les segments audio à transcrire.</param>
-        public async Task StartTranscription(CancellationToken cancellationToken)
+        public async Task StartTranscriptionAsync(CancellationToken cancellationToken)
         {
             // Boucle principale pour consommer la file d'attente et transcrire les segments
             while (!cancellationToken.IsCancellationRequested)
