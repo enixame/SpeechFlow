@@ -2,7 +2,7 @@ using Whisper.net;
 
 namespace SpeechFlowCsharp.AudioProcessing
 {
-    public sealed class TranscriptionWorker
+    public sealed class TranscriptionWorker : ITranscriptionWorker
     {
         private readonly WhisperProcessor? _processor;
 
@@ -15,7 +15,6 @@ namespace SpeechFlowCsharp.AudioProcessing
         /// Les abonnés peuvent utiliser cet événement pour traiter les segments de parole identifiés.
         /// </summary>
         public event EventHandler<string>? TranscriptionCompleted;
-
 
         public TranscriptionWorker(string modelPath, string language)
         {
@@ -38,10 +37,10 @@ namespace SpeechFlowCsharp.AudioProcessing
         }
         
         /// <summary>
-        /// Méthode pour démarrer la transcription dans un thread séparé.
+        /// Méthode pour démarrer la transcription.
         /// </summary>
         /// <param name="queue">File d'attente contenant les segments audio à transcrire.</param>
-        public async Task StartTranscription(CancellationToken cancellationToken)
+        public async Task StartTranscriptionAsync(CancellationToken cancellationToken)
         {
             // Boucle principale pour consommer la file d'attente et transcrire les segments
             while (!cancellationToken.IsCancellationRequested)

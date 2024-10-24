@@ -22,7 +22,7 @@ namespace SpeechFlowCsharp.Tests.AudioProcessing
             };
 
             // Act
-            _ = worker.StartTranscription(cts.Token);
+            _ = worker.StartTranscriptionAsync(cts.Token);
             worker.AddToQueue(samples);
             await Task.Delay(500);
             // Stopper les tâches

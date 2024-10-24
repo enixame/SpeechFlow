@@ -18,24 +18,25 @@ namespace SpeechFlowCsharp.AudioProcessing
 
         public bool IsHumanVoice(short[] buffer)
         {
-            // Convertir les échantillons en float pour appliquer le filtre
+            // Convertir une seule fois les données de short[] vers float[] 
             float[] floatBuffer = ConvertShortArrayToFloatArray(buffer);
 
-            // Appliquer le filtre passe-bande
+            // Appliquer le filtre passe-bande directement sur float[]
             for (int i = 0; i < floatBuffer.Length; i++)
             {
                 floatBuffer[i] = _bandPassFilter.Transform(floatBuffer[i]);
             }
 
-            // Reconvertir en short[] pour utiliser le VAD
+            // Reconvertir les données filtrées en short[] une seule fois
             short[] filteredBuffer = ConvertFloatArrayToShortArray(floatBuffer);
 
-            // Utiliser le VAD pour détecter si la parole humaine est présente
+            // Passer les données au VAD (qui utilise des short[])
             return _vadDetector.IsSpeech(filteredBuffer);
         }
 
         private static float[] ConvertShortArrayToFloatArray(short[] shortArray)
         {
+            // Conversion des short[] vers float[] (normalisation des données)
             float[] floatArray = new float[shortArray.Length];
             for (int i = 0; i < shortArray.Length; i++)
             {
@@ -46,6 +47,7 @@ namespace SpeechFlowCsharp.AudioProcessing
 
         private static short[] ConvertFloatArrayToShortArray(float[] floatArray)
         {
+            // Conversion inverse de float[] vers short[] après le filtrage
             short[] shortArray = new short[floatArray.Length];
             for (int i = 0; i < floatArray.Length; i++)
             {

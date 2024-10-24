@@ -5,7 +5,7 @@ namespace SpeechFlowCsharp.AudioProcessing
     public sealed class VadDetector : IVadDetector
     {
         // Instance de WebRtcVad qui gère la détection d'activité vocale
-        private WebRtcVad _vad;
+        private readonly WebRtcVad _vad;
 
         /// <summary>
         /// Constructeur de VadDetector.
