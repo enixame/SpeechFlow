@@ -40,9 +40,9 @@ namespace SpeechFlowCsharp.Tests
             var mockSegmenter = new Mock<ISpeechSegmenter>();
             speechFlow.WithDefault(16000, GgmlType.Base, Language.French);
             speechFlow.WithSpeechSegmenter(mockSegmenter.Object);
-            var audioData = new short[] { 1, 2, 3 };
+            var audioData = new float[] { 1, 2, 3 };
 
-            void onSpeechSegmentDetected(short[] _) => wasCalled = true;
+            void onSpeechSegmentDetected(float[] _) => wasCalled = true;
             speechFlow.OnSpeechSegmentDetected(onSpeechSegmentDetected);
 
             // Act
@@ -63,9 +63,9 @@ namespace SpeechFlowCsharp.Tests
             var mockAudioCapturer = new Mock<IAudioCapturer>();
             speechFlow.WithDefault(16000, GgmlType.Base, Language.French);
             speechFlow.WithAudioCapturer(mockAudioCapturer.Object);
-            var audioData = new short[] { 1, 2, 3 };
+            var audioData = new float[] { 1, 2, 3 };
 
-            Task onAudioCaptured(short[] _) { wasCalled = true; return Task.CompletedTask; }
+            Task onAudioCaptured(float[] _) { wasCalled = true; return Task.CompletedTask; }
             speechFlow.OnAudioCaptured(onAudioCaptured);
 
             // Act
@@ -111,7 +111,7 @@ namespace SpeechFlowCsharp.Tests
 
             // Assert
             audioCapturerMock.Verify(m => m.StopCapture(), Times.Once);
-            transcriptionWorkerMock.Verify(m => m.AddToQueue(It.IsAny<short[]>()), Times.Never);
+            transcriptionWorkerMock.Verify(m => m.AddToQueue(It.IsAny<float[]>()), Times.Never);
         }
     }
 }

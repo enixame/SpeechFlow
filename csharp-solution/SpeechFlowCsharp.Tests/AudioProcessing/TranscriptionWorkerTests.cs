@@ -10,11 +10,11 @@ namespace SpeechFlowCsharp.Tests.AudioProcessing
             // Arrange
             string modelPath = "models/ggml-tiny.bin"; // Chemin vers le modèle
             var worker = new TranscriptionWorker(modelPath, "fr");
-            short[] samples = Utils.AudioUtils.LoadShortArray(@"data\audioSample.bin");
+            float[] samples = Utils.AudioUtils.LoadFloatArray(@"data\audioSample.bin");
 
             bool hasProcessed = false;
             string? transcriptValue = null;
-            var cts = new CancellationTokenSource();
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             worker.TranscriptionCompleted += (sender, transcript) =>
             {
                 hasProcessed = true;
@@ -22,9 +22,8 @@ namespace SpeechFlowCsharp.Tests.AudioProcessing
             };
 
             // Act
-            _ = worker.StartTranscriptionAsync(cts.Token);
             worker.AddToQueue(samples);
-            await Task.Delay(500);
+            await worker.StartTranscriptionAsync(cts.Token);
             // Stopper les tâches
             cts.Cancel();
 

@@ -4,15 +4,15 @@ namespace SpeechFlowCsharp.AudioProcessing
 {
     public sealed class TranscriptionQueue
     {
-        private readonly ConcurrentQueue<short[]> _queue = new();
+        private readonly ConcurrentQueue<float[]> _queue = new();
         private bool _isRunning = true;
 
-        public void Enqueue(short[] segment)
+        public void Enqueue(float[] segment)
         {
             _queue.Enqueue(segment);
         }
 
-        public bool TryDequeue(out short[]? segment)
+        public bool TryDequeue(out float[]? segment)
         {
             return _queue.TryDequeue(out segment);
         }

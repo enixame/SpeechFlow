@@ -22,10 +22,13 @@ namespace SpeechFlowCsharp.AudioProcessing
         /// </summary>
         /// <param name="audioData">Tableau d'échantillons audio (16 kHz, 16 bits) à analyser.</param>
         /// <returns>Vrai si la parole est détectée, faux sinon.</returns>
-        public bool IsSpeech(short[] audioData)
+        public bool IsSpeech(float[] audioData)
         {
+            // Convertit les données de float à short en les remettant dans la plage d'origine pour le VAD
+            short[] shortBuffer = audioData.Select(f => (short)(f * 32768)).ToArray();
+            
             // Utilise WebRtcVad pour détecter la parole dans le tableau d'échantillons fourni.
-            return _vad.HasSpeech(audioData);
+            return _vad.HasSpeech(shortBuffer);
         }
     }
 }

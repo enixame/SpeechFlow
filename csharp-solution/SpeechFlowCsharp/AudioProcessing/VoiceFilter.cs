@@ -16,44 +16,17 @@ namespace SpeechFlowCsharp.AudioProcessing
             _vadDetector = vad;
         }
 
-        public bool IsHumanVoice(short[] buffer)
+        public bool IsHumanVoice(float[] buffer)
         {
-            // Convertir une seule fois les données de short[] vers float[] 
-            float[] floatBuffer = ConvertShortArrayToFloatArray(buffer);
-
+            float[] floatBuffer = new float[buffer.Length];
             // Appliquer le filtre passe-bande directement sur float[]
-            for (int i = 0; i < floatBuffer.Length; i++)
+            for (int i = 0; i < buffer.Length; i++)
             {
-                floatBuffer[i] = _bandPassFilter.Transform(floatBuffer[i]);
+                floatBuffer[i] = _bandPassFilter.Transform(buffer[i]);
             }
 
-            // Reconvertir les données filtrées en short[] une seule fois
-            short[] filteredBuffer = ConvertFloatArrayToShortArray(floatBuffer);
-
-            // Passer les données au VAD (qui utilise des short[])
-            return _vadDetector.IsSpeech(filteredBuffer);
-        }
-
-        private static float[] ConvertShortArrayToFloatArray(short[] shortArray)
-        {
-            // Conversion des short[] vers float[] (normalisation des données)
-            float[] floatArray = new float[shortArray.Length];
-            for (int i = 0; i < shortArray.Length; i++)
-            {
-                floatArray[i] = shortArray[i] / 32768.0f;
-            }
-            return floatArray;
-        }
-
-        private static short[] ConvertFloatArrayToShortArray(float[] floatArray)
-        {
-            // Conversion inverse de float[] vers short[] après le filtrage
-            short[] shortArray = new short[floatArray.Length];
-            for (int i = 0; i < floatArray.Length; i++)
-            {
-                shortArray[i] = (short)(floatArray[i] * 32768.0f);
-            }
-            return shortArray;
+            // Passer les données au VAD
+            return _vadDetector.IsSpeech(floatBuffer);
         }
     }
 }
