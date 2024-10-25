@@ -1,5 +1,5 @@
 public interface ISpeechSegmenter
 {
-    event EventHandler<short[]>? SpeechSegmentDetected;
-    Task ProcessAudioAsync(short[] audioData);
+    event EventHandler<float[]>? SpeechSegmentDetected;
+    Task ProcessAudioAsync(float[] audioData);
 }

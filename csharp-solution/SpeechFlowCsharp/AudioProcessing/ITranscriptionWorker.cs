@@ -4,7 +4,7 @@ namespace SpeechFlowCsharp.AudioProcessing
     {
         event EventHandler<string>? TranscriptionCompleted;
 
-        void AddToQueue(short[] audioData);
+        void AddToQueue(float[] audioData);
 
         Task StartTranscriptionAsync(CancellationToken cancellationToken);
     }

@@ -10,7 +10,7 @@ namespace SpeechFlowCsharp.Tests.AudioProcessing
             // Arrange
             var vadDetector = new VadDetector();
             var filter = new VoiceFilter(vadDetector, 16000);
-            short[] rawAudio = Utils.AudioUtils.LoadShortArray(@"data\audioSample.bin");
+            float[] rawAudio = Utils.AudioUtils.LoadFloatArray(@"data\audioSample.bin");
 
             // Act
             bool isHumanVoice = filter.IsHumanVoice(rawAudio);

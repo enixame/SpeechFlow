@@ -9,7 +9,7 @@ namespace SpeechFlowCsharp.Tests.AudioProcessing
         {
             // Arrange
             var queue = new TranscriptionQueue();
-            short[] samples = [100, 200, 300];
+            float[] samples = [100, 200, 300];
 
             // Act
             queue.Enqueue(samples);

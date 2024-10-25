@@ -8,7 +8,7 @@ namespace SpeechFlowCsharp.AudioProcessing
 
         private readonly TranscriptionQueue _transcriptionQueue = new();
 
-        private Func<string, bool>? _filterText = null;
+        private readonly Func<string, bool>? _filterText = null;
 
         /// <summary>
         /// Événement déclenché lorsqu'un segment de parole complet est détecté.
@@ -21,8 +21,8 @@ namespace SpeechFlowCsharp.AudioProcessing
             WhisperFactory factory = WhisperFactory.FromPath(modelPath);
             // Créer et configurer le processeur Whisper avec le modèle et la langue spécifiée (français ici)
             _processor = factory.CreateBuilder()  // Créer un builder pour le processeur
-                        .WithLanguage(language)      // Configurer la langue pour la transcription
-                        .Build();                // Construire le processeur
+                        .WithLanguage(language)   // Configurer la langue pour la transcription
+                        .Build();                 // Construire le processeur
         }
 
         public TranscriptionWorker(string modelPath, string language, Func<string, bool> filterText)
@@ -31,7 +31,7 @@ namespace SpeechFlowCsharp.AudioProcessing
             _filterText = filterText;
         }
 
-        public void AddToQueue(short[] audioData)
+        public void AddToQueue(float[] audioData)
         {
             _transcriptionQueue.Enqueue(audioData);
         }
@@ -57,7 +57,7 @@ namespace SpeechFlowCsharp.AudioProcessing
                 }
                 else
                 {
-                    await Task.Delay(50, cancellationToken); // Ajouter un petit délai si la file est vide
+                    await Task.Delay(50); // Ajouter un petit délai si la file est vide
                 }
             }
         }
@@ -67,22 +67,15 @@ namespace SpeechFlowCsharp.AudioProcessing
         /// </summary>
         /// <param name="audioData">Segment audio à transcrire.</param>
         /// <param name="filterText">Segment audio à transcrire.</param>
-        private async Task<string> TranscribeAudioAsync(short[] audioData)
+        private async Task<string> TranscribeAudioAsync(float[] audioData)
         {
-            // Convertir les données audio en un format compatible (par exemple, en tableau de floats)
-            float[] floatAudio = new float[audioData.Length];
-            for (int i = 0; i < audioData.Length; i++)
-            {
-                floatAudio[i] = audioData[i] / 32768f; // Convertir short en float
-            }
-
             if (_processor != null)
             {
                 // Stocker le texte transcrit
                 string transcript = string.Empty;
 
                 // Utiliser la méthode asynchrone ProcessAsync pour transcrire l'audio
-                await foreach (var segment in _processor.ProcessAsync(floatAudio))
+                await foreach (var segment in _processor.ProcessAsync(audioData))
                 {
                     if (segment.Text.Length > 0)
                     {

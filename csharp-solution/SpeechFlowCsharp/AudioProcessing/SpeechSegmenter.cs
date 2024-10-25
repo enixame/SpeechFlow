@@ -10,7 +10,7 @@ namespace SpeechFlowCsharp.AudioProcessing
     public sealed class SpeechSegmenter : ISpeechSegmenter
     {
         // Liste utilisée pour accumuler les échantillons vocaux détectés pendant qu'il y a de la parole.
-        private ConcurrentQueue<short> _currentSegment = new();
+        private ConcurrentQueue<float> _currentSegment = new();
 
         // Crée un filtre passe-bande pour les fréquences de la voix humaine (85 Hz à 255 Hz)
         private readonly IVoiceFilter _voiceFilter;
@@ -19,7 +19,7 @@ namespace SpeechFlowCsharp.AudioProcessing
         /// Événement déclenché lorsqu'un segment de parole complet est détecté.
         /// Les abonnés peuvent utiliser cet événement pour traiter les segments de parole identifiés.
         /// </summary>
-        public event EventHandler<short[]>? SpeechSegmentDetected;
+        public event EventHandler<float[]>? SpeechSegmentDetected;
 
         /// <summary>
         /// Constructeur de la classe SpeechSegmenter.
@@ -42,7 +42,7 @@ namespace SpeechFlowCsharp.AudioProcessing
         }
 
         // Processus asynchrone pour gérer les segments audio
-        public async Task ProcessAudioAsync(short[] audioData)
+        public async Task ProcessAudioAsync(float[] audioData)
         {
             // Appliquer le filtre de voix humaine avant la détection VAD
             if (_voiceFilter.IsHumanVoice(audioData))
@@ -57,7 +57,7 @@ namespace SpeechFlowCsharp.AudioProcessing
             else if (!_currentSegment.IsEmpty)
             {
                 // Créer une liste temporaire pour stocker les échantillons et vider la queue
-                var segmentList = new List<short>();
+                var segmentList = new List<float>();
 
                 while (_currentSegment.TryDequeue(out var sample))
                 {
@@ -74,7 +74,7 @@ namespace SpeechFlowCsharp.AudioProcessing
         }
 
         // Déclenche l'événement lorsqu'un segment de parole est détecté
-        private void OnSpeechSegmentDetected(short[] segment)
+        private void OnSpeechSegmentDetected(float[] segment)
         {
             SpeechSegmentDetected?.Invoke(this, segment);
         }

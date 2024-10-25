@@ -37,12 +37,12 @@ namespace SpeechFlowCsharp
         /// <summary>
         /// Action à exécuter lorsqu'un segment de parole est détecté.
         /// </summary>
-        private Action<short[]>? _onSpeechSegmentDetected;
+        private Action<float[]>? _onSpeechSegmentDetected;
 
         /// <summary>
         /// Fonction asynchrone à exécuter lors de la capture d'audio brut.
         /// </summary>
-        private Func<short[], Task>? _onAudioCaptured;
+        private Func<float[], Task>? _onAudioCaptured;
 
         /// <summary>
         /// Fonction pour filtrer le texte de la transcription avant affichage.
@@ -189,7 +189,7 @@ namespace SpeechFlowCsharp
         /// </summary>
         /// <param name="onSpeechSegmentDetected">Action à exécuter lorsqu'un segment de parole est détecté.</param>
         /// <returns>L'instance configurée de <see cref="SpeechFlow"/>.</returns>
-        public SpeechFlow OnSpeechSegmentDetected(Action<short[]> onSpeechSegmentDetected)
+        public SpeechFlow OnSpeechSegmentDetected(Action<float[]> onSpeechSegmentDetected)
         {
             _onSpeechSegmentDetected = onSpeechSegmentDetected;
             return this;
@@ -200,7 +200,7 @@ namespace SpeechFlowCsharp
         /// </summary>
         /// <param name="onAudioCaptured">Fonction asynchrone à exécuter lorsque l'audio est capturé.</param>
         /// <returns>L'instance configurée de <see cref="SpeechFlow"/>.</returns>
-        public SpeechFlow OnAudioCaptured(Func<short[], Task> onAudioCaptured)
+        public SpeechFlow OnAudioCaptured(Func<float[], Task> onAudioCaptured)
         {
             _onAudioCaptured = onAudioCaptured;
             return this;
@@ -342,8 +342,8 @@ namespace SpeechFlowCsharp
         /// Gestionnaire d'événements pour les segments de parole détectés.
         /// </summary>
         /// <param name="sender">L'expéditeur de l'événement.</param>
-        /// <param name="segment">Le segment de parole détecté sous forme de tableau de shorts (données audio).</param>
-        private void HandleSpeechSegmentDetected(object? sender, short[] segment)
+        /// <param name="segment">Le segment de parole détecté sous forme de tableau de float (données audio).</param>
+        private void HandleSpeechSegmentDetected(object? sender, float[] segment)
         {
             if(_onSpeechSegmentDetected != null)
             {
@@ -359,8 +359,8 @@ namespace SpeechFlowCsharp
         /// Gestionnaire d'événements pour la capture audio.
         /// </summary>
         /// <param name="sender">L'expéditeur de l'événement.</param>
-        /// <param name="audioData">Les données audio capturées sous forme de tableau de shorts.</param>
-        private async void HandleAudioCaptured(object? sender, short[] audioData)
+        /// <param name="audioData">Les données audio capturées sous forme de tableau de float.</param>
+        private async void HandleAudioCaptured(object? sender, float[] audioData)
         {
             if (_onAudioCaptured != null)
             {
