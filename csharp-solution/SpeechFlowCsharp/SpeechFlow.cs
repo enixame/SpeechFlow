@@ -69,6 +69,11 @@ namespace SpeechFlowCsharp
         /// </summary>
         private string? _language;
 
+        /// <summary>
+        /// Traduire le texte en anglais
+        /// </summary>
+        private bool _englishTranslation;
+
         // Constructeurs et méthodes publiques
 
         /// <summary>
@@ -148,6 +153,15 @@ namespace SpeechFlowCsharp
         public SpeechFlow WithLanguage(Language language)
         {
             _language = LanguageStringMapper.ToLanguageString(language);
+            return this;
+        }
+
+        /// <summary>
+        /// Configure l'instance pour la traduction en anglais.
+        /// </summary>
+        public SpeechFlow WithEnglishTranslation()
+        {
+            _englishTranslation = true;
             return this;
         }
 
@@ -312,12 +326,21 @@ namespace SpeechFlowCsharp
             _audioCapturer?.StartCapture();
 
             // Démarrer la transcription dans un thread séparé
-            _ = Task.Run(async () => 
+            _ = Task.Run(async () =>
             {
-                if(_transcriptionWorker != null)
+                if (_transcriptionWorker == null)
+                {
+                    return;
+                }
+                
+                if (_englishTranslation)
+                {
+                    await _transcriptionWorker.StartTranslationAsync(_cancellationTokenSource.Token);
+                }
+                else
                 {
                     await _transcriptionWorker.StartTranscriptionAsync(_cancellationTokenSource.Token);
-                }  
+                }
             });
 
             return this;
