@@ -7,5 +7,7 @@ namespace SpeechFlowCsharp.AudioProcessing
         void AddToQueue(float[] audioData);
 
         Task StartTranscriptionAsync(CancellationToken cancellationToken);
+
+        Task StartTranslationAsync(CancellationToken cancellationToken);
     }
 }

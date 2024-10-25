@@ -5,10 +5,10 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        var ggmlType = GgmlType.Base;
+        var ggmlType = GgmlType.LargeV3;
         using var speechFlow = await SpeechFlow.Create()
                                                .WithDefaultFrenchAudioRate(ggmlType)
-                                               //.OnFilterText((text) => text.StartsWith(" Sous-titrage") || text.Equals(" Merci."))
+                                               .WithEnglishTranslation()
                                                .OnTranscriptionCompleted((transcription) => Console.WriteLine($"Text transcrit: {transcription}"))
                                                .StartAsync();
 

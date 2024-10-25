@@ -4,9 +4,13 @@ namespace SpeechFlowCsharp.AudioProcessing
 {
     public sealed class TranscriptionWorker : ITranscriptionWorker
     {
-        private readonly WhisperProcessor? _processor;
+        private WhisperProcessor? _processor;
 
         private readonly TranscriptionQueue _transcriptionQueue = new();
+
+        private readonly string? _modelPath;
+
+        private readonly string? _language;
 
         private readonly Func<string, bool>? _filterText = null;
 
@@ -18,11 +22,8 @@ namespace SpeechFlowCsharp.AudioProcessing
 
         public TranscriptionWorker(string modelPath, string language)
         {
-            WhisperFactory factory = WhisperFactory.FromPath(modelPath);
-            // Créer et configurer le processeur Whisper avec le modèle et la langue spécifiée (français ici)
-            _processor = factory.CreateBuilder()  // Créer un builder pour le processeur
-                        .WithLanguage(language)   // Configurer la langue pour la transcription
-                        .Build();                 // Construire le processeur
+            _modelPath = modelPath;
+            _language = language;
         }
 
         public TranscriptionWorker(string modelPath, string language, Func<string, bool> filterText)
@@ -35,12 +36,52 @@ namespace SpeechFlowCsharp.AudioProcessing
         {
             _transcriptionQueue.Enqueue(audioData);
         }
+
+        /// <summary>
+        /// Build the model
+        /// </summary>
+        /// <param name="translate">translate into english</param>
+        private void BuildModel(bool translate)
+        {
+            if(_processor != null)
+            {
+                return;
+            }
+
+            WhisperFactory factory = WhisperFactory.FromPath(_modelPath!);
+            // Créer et configurer le processeur Whisper avec le modèle et la langue spécifiée (français ici)
+            var builder = factory.CreateBuilder()           // Créer un builder pour le processeur
+                                 .WithLanguage(_language!); // Configurer la langue pour la transcription
+
+            if(translate) // traduire en anglais
+            {
+                builder = builder.WithTranslate();
+            }
+
+            _processor = builder.Build(); // Construire le processeur
+        }
+
+        /// <summary>
+        /// Méthode pour démarrer la traduction.
+        /// </summary>
+        /// <param name="queue">File d'attente contenant les segments audio à traduire.</param>
+        public async Task StartTranslationAsync(CancellationToken cancellationToken)
+        {
+            BuildModel(true);
+            await StartAsync(cancellationToken);
+        }
         
         /// <summary>
         /// Méthode pour démarrer la transcription.
         /// </summary>
         /// <param name="queue">File d'attente contenant les segments audio à transcrire.</param>
         public async Task StartTranscriptionAsync(CancellationToken cancellationToken)
+        {
+            BuildModel(false);
+            await StartAsync(cancellationToken);
+        }
+
+        private async Task StartAsync(CancellationToken cancellationToken)
         {
             // Boucle principale pour consommer la file d'attente et transcrire les segments
             while (!cancellationToken.IsCancellationRequested)
