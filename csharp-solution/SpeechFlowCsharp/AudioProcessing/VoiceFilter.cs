@@ -13,7 +13,6 @@ namespace SpeechFlowCsharp.AudioProcessing
             float lowCut = 85.0f;
             float highCut = 255.0f;
             _bandPassFilter = BiQuadFilter.BandPassFilterConstantPeakGain(sampleRate, (lowCut + highCut) / 2, (highCut - lowCut));
-            _vadDetector = vad;
             
             // Initialise le détecteur d'activité vocale (VAD)
             _vadDetector = vad;
