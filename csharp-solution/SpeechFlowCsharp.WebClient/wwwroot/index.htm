@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcription en temps réel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+    <style>
+        body {
+            background-color: rgba(0, 128, 0, 0.8); /* Fond vert avec transparence */
+            color: white; /* Couleur du texte */
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Placer les éléments en bas */
+            align-items: center;
+        }
+        #transcription {
+            background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent pour le texte */
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 80%; /* Pour éviter que le texte ne dépasse trop la largeur de la page */
+            word-wrap: break-word;
+            margin-bottom: 20px; /* Espacement par rapport au bas de la page */
+            display: none; /* Caché par défaut */
+        }
+        #urlInputContainer {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: auto; /* Garder le formulaire en haut de la page */
+        }
+        #urlInput {
+            padding: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        #connectButton {
+            padding: 10px 15px;
+            font-size: 18px;
+            color: white;
+            background-color: green;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="urlInputContainer">
+        <input type="text" id="urlInput" placeholder="Entrez l'URL du serveur..." />
+        <button id="connectButton">Se connecter</button>
+    </div>
+
+    <div id="transcription"></div>
+
+    <script>
+        /**
+         * Classe responsable de la gestion de la connexion SignalR et de l'affichage de la transcription.
+         */
+        class TranscriptionClient {
+            /**
+             * Crée une instance de TranscriptionClient.
+             * @param {string} url - L'URL du hub SignalR.
+             * @param {HTMLElement} displayElement - Élément HTML où la transcription sera affichée.
+             */
+            constructor(url, displayElement) {
+                this.connection = new signalR.HubConnectionBuilder()
+                    .withUrl(url)
+                    .build();
+                this.displayElement = displayElement;
+                this.maxLength = 255;
+                this.inactiveDelay = 10000; // 10 secondes d'inactivité avant d'effacer le texte
+                this.lastUpdateTime = 0; // Stocker le dernier temps de mise à jour
+                this.timeoutId = null;
+
+                this._initializeConnection();
+            }
+
+            /**
+             * Initialise la connexion SignalR et configure les événements.
+             * @private
+             */
+            _initializeConnection() {
+                this.connection.on("ReceiveMessage", (message) => {
+                    this._updateDisplay(message);
+                });
+
+                this.connection.start()
+                    .catch((err) => {
+                        console.error("Erreur de connexion:", err.toString());
+                    });
+            }
+
+            /**
+             * Met à jour l'affichage de la transcription avec un nouveau message.
+             * @param {string} newMessage - Le message reçu via SignalR.
+             * @private
+             */
+            _updateDisplay(newMessage) {
+                const currentText = this.displayElement.textContent;
+                const combinedText = `${currentText} ${newMessage}`.trim();
+
+                // Limiter le texte à 255 caractères cumulés
+                this.displayElement.textContent = combinedText.length > this.maxLength
+                    ? newMessage
+                    : combinedText;
+
+                // Mettre à jour le dernier temps de mise à jour
+                this.lastUpdateTime = Date.now();
+
+                // Réinitialiser le timer d'inactivité
+                this._resetTimer();
+            }
+
+            /**
+             * Réinitialise le timer d'inactivité.
+             * @private
+             */
+            _resetTimer() {
+                // Arrêter l'ancien timer s'il existe
+                if (this.timeoutId) {
+                    clearTimeout(this.timeoutId);
+                }
+
+                // Démarrer un nouveau timer
+                this.timeoutId = setTimeout(() => {
+                    // Vérifier que le texte n'a pas été mis à jour récemment
+                    const currentTime = Date.now();
+                    const timeDiff = currentTime - this.lastUpdateTime;
+
+                    if (timeDiff >= this.inactiveDelay) {
+                        this.displayElement.textContent = "";
+                    }
+                }, this.inactiveDelay);
+            }
+        }
+
+        // Gestion de l'entrée de l'URL
+        document.getElementById('connectButton').addEventListener('click', () => {
+            const urlInput = document.getElementById('urlInput').value.trim();
+            if (urlInput) {
+                // Ajouter "/transcriptionHub" à l'URL saisie par l'utilisateur
+                const formattedUrl = urlInput.endsWith("/")
+                    ? `${urlInput}transcriptionHub`
+                    : `${urlInput}/transcriptionHub`;
+
+                // Masquer le formulaire d'URL et afficher la zone de transcription
+                document.getElementById('urlInputContainer').style.display = 'none';
+                const transcriptionDiv = document.getElementById('transcription');
+                transcriptionDiv.style.display = 'block';
+
+                // Initialiser le client avec l'URL complète
+                new TranscriptionClient(formattedUrl, transcriptionDiv);
+            } else {
+                alert("Veuillez entrer une URL valide.");
+            }
+        });
+    </script>
+</body>
+</html>

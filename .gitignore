@@ -201,3 +201,7 @@ artifacts/
 # ignore models from SpeechFlowCsharp project
 /csharp-solution/SpeechFlowCsharp/models
 /csharp-solution/SpeechFlowCsharp.Console/models
+/csharp-solution/SpeechFlowCsharp.SignalR/models
+
+# publish
+publish
