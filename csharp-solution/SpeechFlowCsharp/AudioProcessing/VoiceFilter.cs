@@ -10,7 +10,10 @@ namespace SpeechFlowCsharp.AudioProcessing
         public VoiceFilter(IVadDetector vad, int sampleRate)
         {
             // Crée un filtre passe-bande pour les fréquences de la voix humaine (85 Hz à 255 Hz)
-            _bandPassFilter = BiQuadFilter.BandPassFilterConstantPeakGain(sampleRate, 255.0f, 85.0f);
+            float lowCut = 85.0f;
+            float highCut = 255.0f;
+            _bandPassFilter = BiQuadFilter.BandPassFilterConstantPeakGain(sampleRate, (lowCut + highCut) / 2, (highCut - lowCut));
+            _vadDetector = vad;
             
             // Initialise le détecteur d'activité vocale (VAD)
             _vadDetector = vad;

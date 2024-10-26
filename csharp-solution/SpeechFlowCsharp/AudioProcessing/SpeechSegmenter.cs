@@ -15,6 +15,9 @@ namespace SpeechFlowCsharp.AudioProcessing
         // Crée un filtre passe-bande pour les fréquences de la voix humaine (85 Hz à 255 Hz)
         private readonly IVoiceFilter _voiceFilter;
 
+        // Indique si nous sommes actuellement en train de détecter de la parole
+        private bool _isSpeaking = false;
+
         /// <summary>
         /// Événement déclenché lorsqu'un segment de parole complet est détecté.
         /// Les abonnés peuvent utiliser cet événement pour traiter les segments de parole identifiés.
@@ -44,39 +47,42 @@ namespace SpeechFlowCsharp.AudioProcessing
         // Processus asynchrone pour gérer les segments audio
         public async Task ProcessAudioAsync(float[] audioData)
         {
-            // Appliquer le filtre de voix humaine avant la détection VAD
-            if (_voiceFilter.IsHumanVoice(audioData))
+            // Vérifie si la voix humaine est détectée dans les données audio
+            bool speechDetected = _voiceFilter.IsHumanVoice(audioData);
+
+            if (speechDetected)
             {
-                // Si de la parole est détectée, accumuler les échantillons dans le segment en cours.
-                // Ajouter les échantillons à la queue de manière thread-safe
+                if (!_isSpeaking)
+                {
+                    _isSpeaking = true;
+                    // Début d'un nouveau segment de parole
+                }
+                // Accumuler les échantillons audio
                 foreach (var sample in audioData)
                 {
                     _currentSegment.Enqueue(sample);
                 }
             }
-            else if (!_currentSegment.IsEmpty)
+            else if (_isSpeaking)
             {
-                // Créer une liste temporaire pour stocker les échantillons et vider la queue
-                var segmentList = new List<float>();
-
-                while (_currentSegment.TryDequeue(out var sample))
-                {
-                    segmentList.Add(sample);
-                }
-
-                if (segmentList.Count > 0)
-                {
-                    // Si un silence est détecté (et que nous avons un segment accumulé), déclencher l'événement.
-                    OnSpeechSegmentDetected([.. segmentList]);
-                }
+                _isSpeaking = false;
+                // Fin du segment de parole, déclencher l'événement
+                var segmentArray = _currentSegment.ToArray();
+                _currentSegment.Clear();
+                OnSpeechSegmentDetected(segmentArray);
             }
-            await Task.CompletedTask;  // Utilisation d'une tâche asynchrone pour améliorer la réactivité
+
+            // Pas besoin d'attendre ici, mais on garde la signature asynchrone pour compatibilité
+            await Task.CompletedTask;
         }
 
         // Déclenche l'événement lorsqu'un segment de parole est détecté
         private void OnSpeechSegmentDetected(float[] segment)
         {
-            SpeechSegmentDetected?.Invoke(this, segment);
+            if (segment.Length > 0)
+            {
+                SpeechSegmentDetected?.Invoke(this, segment);
+            }
         }
     }
 }

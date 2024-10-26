@@ -90,6 +90,7 @@ namespace SpeechFlowCsharp.Tests
 
             // Act
             await speechFlow.StartAsync();
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
 
             // Assert
             transcriptionWorkerMock.Verify(m => m.StartTranscriptionAsync(It.IsAny<CancellationToken>()), Times.Once);
