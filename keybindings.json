@@ -3,7 +3,7 @@
     {
         "key": "ctrl+shift+r",
         "command": "workbench.action.tasks.runTask",
-        "args": "Run .NET Project"
+        "args": "Run Console Project"
     },
     {
         "key": "ctrl+shift+t",

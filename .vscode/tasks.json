@@ -32,6 +32,16 @@
         "problemMatcher": "$msCompile"
       },
       {
+        "label": "build SpeechFlowCsharp console",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+          "build",
+          "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.Console/SpeechFlowCsharp.Console.csproj"
+        ],
+        "problemMatcher": "$msCompile"
+      },
+      {
         "label": "build SpeechFlowCsharp.Tests",
         "command": "dotnet",
         "type": "process",
@@ -42,14 +52,14 @@
         "problemMatcher": "$msCompile"
       },
       {
-        "label": "Run .NET Project",
+        "label": "Run Console Project",
         "type": "shell",
         "command": "dotnet",
         "args": [
           "run"
         ],
         "options": {
-          "cwd": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp"
+          "cwd": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.Console"
         },
         "group": {
           "kind": "build",
