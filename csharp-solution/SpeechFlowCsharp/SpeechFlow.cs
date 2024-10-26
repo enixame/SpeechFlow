@@ -107,7 +107,7 @@ namespace SpeechFlowCsharp
             // Initialisation des composants audio et VAD
             var waveFormat = new WaveFormat(sampleRate, 1); // Format audio avec un seul canal
             _audioCapturer = new AudioCapturer(waveFormat);
-            var vadDetector = new VadDetector(); // Détecteur d'activité vocale
+            var vadDetector = new VadDetector(sampleRate / 1600 ); // Détecteur d'activité vocale
             _speechSegmenter = new SpeechSegmenter(vadDetector, sampleRate);
 
             return this;

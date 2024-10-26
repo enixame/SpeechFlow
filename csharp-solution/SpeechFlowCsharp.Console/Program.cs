@@ -7,7 +7,7 @@ class Program
     {
         var ggmlType = GgmlType.LargeV3Turbo;
         using var speechFlow = await SpeechFlow.Create()
-                                               .WithDefaultFrenchAudioRate(ggmlType)
+                                               .WithDefault(16000, ggmlType, SpeechFlowCsharp.Enums.Language.French)
                                                .OnTranscriptionCompleted((transcription) => Console.WriteLine($"Text transcrit: {transcription}"))
                                                .StartAsync();
 
