@@ -26,7 +26,7 @@ namespace SpeechFlowCsharp.SignalR
             {
                 try
                 {
-                    var ggmlType = GgmlType.Medium; // Ajuster selon le besoin
+                    var ggmlType = GgmlType.LargeV3Turbo; // Ajuster selon le besoin
                     _speechFlow = await SpeechFlow.Create()
                                                 .WithDefaultFrenchAudioRate(ggmlType)
                                                 .OnTranscriptionCompleted(async (transcription) =>
