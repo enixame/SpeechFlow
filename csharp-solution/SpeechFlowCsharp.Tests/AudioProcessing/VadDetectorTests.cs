@@ -9,10 +9,10 @@ namespace SpeechFlowCsharp.Tests.AudioProcessing
         {
             // Arrange
             var vadDetector = new VadDetector();
-            float[] voiceSample = [100, 200, 300]; // Simuler un échantillon vocal
+            float[] rawAudio = Utils.AudioUtils.LoadFloatArray(@"data\audioSample.bin");
 
             // Act
-            bool isSpeechDetected = vadDetector.IsSpeech(voiceSample);
+            bool isSpeechDetected = vadDetector.IsSpeech(rawAudio);
 
             // Assert
             Assert.True(isSpeechDetected);
