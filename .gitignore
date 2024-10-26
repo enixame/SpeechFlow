@@ -200,3 +200,4 @@ artifacts/
 
 # ignore models from SpeechFlowCsharp project
 /csharp-solution/SpeechFlowCsharp/models
+/csharp-solution/SpeechFlowCsharp.Console/models
