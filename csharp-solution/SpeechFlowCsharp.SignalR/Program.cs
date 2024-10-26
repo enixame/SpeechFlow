@@ -9,10 +9,7 @@ namespace SpeechFlowCsharp.SignalR
 
             // Démarrer le serveur SignalR
             signalRServer.Start();
-
-            Console.WriteLine("Appuyez sur Entrée pour arrêter le serveur.");
-            Console.ReadLine();
-
+            
             // Arrêter le serveur proprement
             signalRServer.Stop();
         }

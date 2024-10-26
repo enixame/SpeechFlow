@@ -118,7 +118,7 @@
           "-c",
           "Release",
           "-o",
-          "./publish"
+          "../../signalr-server"
         ],
         "options": {
           "cwd": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.SignalR"
@@ -135,10 +135,11 @@
         "type": "process",
         "args": [
           "publish",
+          "SpeechFlowCsharp.WebClient.csproj",
           "-c",
           "Release",
           "-o",
-          "./webclient"
+          "../../signalr-client"
         ],
         "options": {
           "cwd": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.WebClient"
