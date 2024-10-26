@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeechFlowCsharp.Tests", "c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeechFlowCsharp.Console", "csharp-solution\SpeechFlowCsharp.Console\SpeechFlowCsharp.Console.csproj", "{9FFAE858-9127-4966-8E18-53AE4812D9FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeechFlowCsharp.SignalR", "csharp-solution\SpeechFlowCsharp.SignalR\SpeechFlowCsharp.SignalR.csproj", "{73C91ECC-E6A8-4CD7-BDA7-0AACDEFE0E70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeechFlowCsharp.WebClient", "csharp-solution\SpeechFlowCsharp.WebClient\SpeechFlowCsharp.WebClient.csproj", "{619BF24A-7D5B-4388-B7D2-27BEE1DDADBF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +33,14 @@ Global
 		{9FFAE858-9127-4966-8E18-53AE4812D9FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FFAE858-9127-4966-8E18-53AE4812D9FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FFAE858-9127-4966-8E18-53AE4812D9FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73C91ECC-E6A8-4CD7-BDA7-0AACDEFE0E70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73C91ECC-E6A8-4CD7-BDA7-0AACDEFE0E70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73C91ECC-E6A8-4CD7-BDA7-0AACDEFE0E70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73C91ECC-E6A8-4CD7-BDA7-0AACDEFE0E70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{619BF24A-7D5B-4388-B7D2-27BEE1DDADBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{619BF24A-7D5B-4388-B7D2-27BEE1DDADBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{619BF24A-7D5B-4388-B7D2-27BEE1DDADBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{619BF24A-7D5B-4388-B7D2-27BEE1DDADBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +49,8 @@ Global
 		{6BE156D1-3081-4556-8006-D778CDB1A074} = {F9668881-259A-4661-9BDE-3E6DD629C4C2}
 		{33F1572D-7223-4CAC-A957-D6F7F66085FC} = {F9668881-259A-4661-9BDE-3E6DD629C4C2}
 		{9FFAE858-9127-4966-8E18-53AE4812D9FF} = {F9668881-259A-4661-9BDE-3E6DD629C4C2}
+		{73C91ECC-E6A8-4CD7-BDA7-0AACDEFE0E70} = {F9668881-259A-4661-9BDE-3E6DD629C4C2}
+		{619BF24A-7D5B-4388-B7D2-27BEE1DDADBF} = {F9668881-259A-4661-9BDE-3E6DD629C4C2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D7FE95FA-FD37-4F08-9858-707F84368A6D}

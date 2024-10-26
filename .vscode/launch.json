@@ -16,6 +16,17 @@
         "console": "internalConsole"
     },
     {
+        "name": ".NET Core Launch (server)",
+        "type": "coreclr",
+        "request": "launch",
+        "preLaunchTask": "build SpeechFlowCsharp server",
+        "program": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.SignalR/bin/Debug/net8.0-windows/SpeechFlowCsharp.SignalR.dll",
+        "args": [],
+        "cwd": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.SignalR",
+        "stopAtEntry": false,
+        "console": "internalConsole"
+    },
+    {
         "name": "Python Debugger: Current File",
         "type": "debugpy",
         "request": "launch",

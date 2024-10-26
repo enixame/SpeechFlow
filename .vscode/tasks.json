@@ -42,6 +42,16 @@
         "problemMatcher": "$msCompile"
       },
       {
+        "label": "build SpeechFlowCsharp server",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+          "build",
+          "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.SignalR/SpeechFlowCsharp.SignalR.csproj"
+        ],
+        "problemMatcher": "$msCompile"
+      },
+      {
         "label": "build SpeechFlowCsharp.Tests",
         "command": "dotnet",
         "type": "process",
@@ -66,6 +76,78 @@
           "isDefault": true
         },
         "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "Run Server Project",
+        "type": "shell",
+        "command": "dotnet",
+        "args": [
+          "run"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.SignalR"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "Run Client Project",
+        "type": "shell",
+        "command": "dotnet",
+        "args": [
+          "run"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.WebClient"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": "$msCompile"
+      },
+      {
+        "label": "publish Server",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+          "publish",
+          "-c",
+          "Release",
+          "-o",
+          "./publish"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.SignalR"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": ["$msCompile"]
+      },
+      {
+        "label": "publish Client",
+        "command": "dotnet",
+        "type": "process",
+        "args": [
+          "publish",
+          "-c",
+          "Release",
+          "-o",
+          "./webclient"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}/csharp-solution/SpeechFlowCsharp.WebClient"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": ["$msCompile"]
       },
       {
         "label": "Run .NET Tests",

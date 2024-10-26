@@ -6,6 +6,11 @@
         "args": "Run Console Project"
     },
     {
+        "key": "ctrl+shift+s",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Run Server Project"
+    },
+    {
         "key": "ctrl+shift+t",
         "command": "workbench.action.tasks.runTask",
         "args": "Run .NET Tests"
