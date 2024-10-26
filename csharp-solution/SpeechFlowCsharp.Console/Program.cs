@@ -5,7 +5,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        var ggmlType = GgmlType.Medium;
+        var ggmlType = GgmlType.LargeV3Turbo;
         using var speechFlow = await SpeechFlow.Create()
                                                .WithDefaultFrenchAudioRate(ggmlType)
                                                .OnTranscriptionCompleted((transcription) => Console.WriteLine($"Text transcrit: {transcription}"))

@@ -10,6 +10,9 @@ namespace SpeechFlowCsharp.AudioProcessing
         // Taille de trame en échantillons (160 pour 10 ms à 16 kHz)
         private readonly int _frameSize;
 
+        // 16 échantillons par ms
+        private const int SampleSize = 16;
+
         private short[] _residualBuffer = [];
 
         /// <summary>
@@ -23,13 +26,52 @@ namespace SpeechFlowCsharp.AudioProcessing
             if (frameDurationMs != 10 && frameDurationMs != 20 && frameDurationMs != 30)
                 throw new ArgumentException("La durée de la trame doit être 10, 20 ou 30 ms.", nameof(frameDurationMs));
 
-            // Initialise avec les paramètres par défaut (agressivité définie dans l'objet WebRtcVad).
-            _vad = new WebRtcVad();
-
             // Calculer la taille de la trame en échantillons
-            _frameSize = frameDurationMs * 16; // 16 échantillons par ms à 16 kHz
+            _frameSize = frameDurationMs * SampleSize; // 16 échantillons par ms à 16 kHz
+
+            // Initialise avec les paramètres par défaut (agressivité définie dans l'objet WebRtcVad).
+            _vad = new WebRtcVad()
+            {
+                OperatingMode = OperatingMode.Aggressive,
+                FrameLength = GetFrameLength(frameDurationMs),
+                SampleRate = GetSampleRate(_frameSize)
+            };
         }
 
+        /// <summary>
+        /// Récupère la tailled'une frame audio
+        /// </summary>
+        /// <param name="frameDurationMs">Durée de la trame en millisecondes (10, 20 ou 30)</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        private static FrameLength GetFrameLength(int frameDurationMs)
+        {
+            return frameDurationMs switch
+            {
+                10 => FrameLength.Is10ms,
+                20 => FrameLength.Is20ms,
+                30 => FrameLength.Is30ms,
+                _ => throw new ArgumentOutOfRangeException(nameof(frameDurationMs))
+            };
+        }
+
+        /// <summary>
+        /// Récuère le taux d'échantillonnage
+        /// </summary>
+        /// <param name="frameSize">taille d'une frame audio</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        private static SampleRate GetSampleRate(int frameSize)
+        {
+            return frameSize switch
+            {
+                160 => SampleRate.Is16kHz,
+                320 => SampleRate.Is32kHz,
+                480 => SampleRate.Is48kHz,
+                _ => throw new ArgumentOutOfRangeException(nameof(frameSize))
+            };
+        }
+        
         /// <summary>
         /// Vérifie si un segment audio contient de la parole.
         /// </summary>
