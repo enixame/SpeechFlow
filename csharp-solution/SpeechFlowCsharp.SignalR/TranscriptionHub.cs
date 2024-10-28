@@ -100,8 +100,11 @@ namespace SpeechFlowCsharp.SignalR
             await _speechFlowSemaphore.WaitAsync();
             try
             {
+                // Utilisation de CompareExchange pour vérifier le nombre actuel de clients connectés sans modification.
+                int currentCount = Interlocked.CompareExchange(ref _connectedClientsCount, 0, 0);
+
                 // Si aucun client n'est connecté, dispose de SpeechFlow pour libérer des ressources.
-                if (_connectedClientsCount <= 0 && _speechFlow != null)
+                if (currentCount <= 0 && _speechFlow != null)
                 {
                     try
                     {
