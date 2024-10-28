@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
 using Whisper.net.Ggml;
-using System.Threading;
 
 namespace SpeechFlowCsharp.SignalR
 {
