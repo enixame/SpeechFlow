@@ -20,7 +20,7 @@ namespace SpeechFlowCsharp.SignalR
         private static IDisposable? _speechFlow;
 
         // Sémaphore pour gérer l'accès à l'instance de SpeechFlow et éviter les conflits de threads.
-        private static readonly SemaphoreSlim _speechFlowSemaphore = new SemaphoreSlim(1, 1);
+        private static readonly SemaphoreSlim _speechFlowSemaphore = new(1, 1);
 
         // Contexte du hub utilisé pour envoyer des messages aux clients connectés, même depuis des tâches asynchrones.
         private readonly IHubContext<TranscriptionHub> _hubContext;
